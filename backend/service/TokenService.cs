@@ -29,14 +29,14 @@ public class TokenService : ITokenService
 
         public async Task<TokenResponse> GenerateTokens(User user)
         {
-            // Generăm JWT token
+            // generate jwt token
             var accessToken = await GenerateAccessToken(user);
             
-            // Generăm refresh token
+            // generate refresh token
             var refreshToken = GenerateRefreshToken();
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(7); // Valid 7 zile
             
-            // Salvăm refresh token în baza de date
+            // save refresh token in database
             var userRefreshToken = new RefreshToken
             {
                 UserId = user.Id,
@@ -45,7 +45,7 @@ public class TokenService : ITokenService
                 IsRevoked = false
             };
             
-            // Eliminăm orice token existent pentru acest utilizator
+            // eliminate any token existing for this user
             var existingTokens = await _context.RefreshTokens
                 .Where(t => t.UserId == user.Id)
                 .ToListAsync();
@@ -77,7 +77,7 @@ public class TokenService : ITokenService
             if (storedToken.IsRevoked)
                 throw new SecurityTokenException("Refresh token revoked");
                 
-            // Generăm un nou set de tokens
+            // generate new set of tokens
             var user = storedToken.User;
             return await GenerateTokens(user);
         }
@@ -105,13 +105,13 @@ public class TokenService : ITokenService
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
             
-            // Adăugăm rolurile ca claims
+            // add roles as claims
             foreach (var userRole in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
             
-            // Adăugăm divizia ca claim (dacă există)
+            // add division as claim
             if (user.DivisionId.HasValue)
             {
                 authClaims.Add(new Claim("DivisionId", user.DivisionId.Value.ToString()));

@@ -9,11 +9,9 @@ using backend.service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Adăugare DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Adăugare Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -25,7 +23,6 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Adăugare autentificare JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,12 +46,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Adăugare servicii personalizate
+// add services
 builder.Services.AddScoped<ITokenService, TokenService>();
 // builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 // builder.Services.AddScoped<IGateService, GateService>();
 
-// Adăugare politici de autorizare
+// auth policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("HROnly", policy => policy.RequireRole("HR"));
@@ -63,7 +60,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("HR", "GatePersonnel"));
 });
 
-// Adăugare controllere și configurare CORS
+// add controllers and cors
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
@@ -77,16 +74,16 @@ builder.Services.AddCors(options =>
 });
 
 
-// Adăugare SignalR pentru comunicare în timp real
+// add signalR for real time 
 builder.Services.AddSignalR();
 
-// Adăugare Swagger
+// add swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configurare pipeline HTTP
+// http pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -109,13 +106,13 @@ app.UseAuthorization();
 app.MapControllers();
 // app.MapHub<GateHub>("/gatehub");
 
-// Inițializare roluri
+// init roles
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     
-    // Creează rolurile dacă nu există
+    // create roles if non-existing
     string[] roleNames = { "HR", "GatePersonnel" };
     foreach (var roleName in roleNames)
     {
@@ -126,7 +123,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
     
-    // Creează un utilizator HR implicit dacă nu există
+    // create hr user
     var adminUser = await userManager.FindByNameAsync("hr@company.com");
     if (adminUser == null)
     {
@@ -146,7 +143,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
     
-    // Creează un utilizator pentru poartă
+    // create gate user
     var gateUser = await userManager.FindByNameAsync("gate@company.com");
     if (gateUser == null)
     {

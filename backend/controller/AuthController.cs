@@ -81,12 +81,12 @@ namespace backend.controller
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            // Verifică dacă utilizatorul există deja
+            // verify if user exists
             var userExists = await _userManager.FindByEmailAsync(model.Email);
             if (userExists != null)
                 return BadRequest(new { message = "Un utilizator cu acest email există deja" });
 
-            // Creează noul utilizator
+            // create new user
             var user = new User
             {
                 UserName = model.Email,
@@ -101,7 +101,7 @@ namespace backend.controller
                 return StatusCode(StatusCodes.Status500InternalServerError, 
                     new { message = "Eroare la crearea utilizatorului", errors = result.Errors });
 
-            // Adaugă utilizatorul la rolul specificat
+            // add user to specified role
             await _userManager.AddToRoleAsync(user, model.Role);
 
             return Ok(new { message = "Utilizator creat cu succes" });
