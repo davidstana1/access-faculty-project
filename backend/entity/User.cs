@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace backend.entity;
 
-public class User
+public class User : IdentityUser
 {
-    public int userId { get; set; }
-    public string username { get; set; }
-    public string email { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? DivisionId { get; set; }
+    public Division Division { get; set; }
 }
