@@ -1,0 +1,76 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Employee {
+  id: number;
+  firstName: string;
+  lastName: string;
+  cnp: string;
+  badgeNumber: string;
+  photoUrl: string;
+  divisionId: number;
+  divisionName: string;
+  bluetoothSecurityCode: string;
+  vehicleNumber: string;
+  isAccessEnabled: boolean;
+  approvalDate: Date;
+}
+
+export interface CreateEmployeeDto {
+  firstName: string;
+  lastName: string;
+  cnp: string;
+  badgeNumber: string;
+  photoUrl: string;
+  divisionId: number;
+  bluetoothSecurityCode: string;
+  vehicleNumber: string;
+}
+
+export interface UpdateEmployeeDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  cnp: string;
+  badgeNumber: string;
+  photoUrl: string;
+  divisionId: number;
+  bluetoothSecurityCode: string;
+  vehicleNumber: string;
+  isAccessEnabled: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+  private apiUrl = `http://localhost:5203/api/employee`;
+
+  constructor(private http: HttpClient) { }
+
+  getEmployees(): Observable<Employee[]> {
+    return this.http.get<Employee[]>(this.apiUrl);
+  }
+
+  getEmployee(id: number): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/${id}`);
+  }
+
+  createEmployee(employee: CreateEmployeeDto): Observable<Employee> {
+    return this.http.post<Employee>(this.apiUrl, employee);
+  }
+
+  updateEmployee(id: number, employee: UpdateEmployeeDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, employee);
+  }
+
+  deleteEmployee(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  toggleAccess(id: number, employee: UpdateEmployeeDto): Observable<void> {
+    employee.isAccessEnabled = !employee.isAccessEnabled;
+    return this.updateEmployee(id, employee);
+  }
+}

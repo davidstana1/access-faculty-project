@@ -168,3 +168,9 @@
 /home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Security.Cryptography.ProtectedData.dll
 /home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
 /home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.Extensions.Identity.Core.dll
+/home/david/Desktop/access-faculty-project/backend/bin/Debug/net8.0/Microsoft.Extensions.Identity.Stores.dll

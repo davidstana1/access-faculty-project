@@ -1,0 +1,21 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Dashboard</h2>
+    </div>
+    <div class="sidebar-menu">
+      <ul>
+        <li [class.active]="router.url === '/employees'">
+          <a [routerLink]="['/employees']">
+            <i class="icon">👥</i>
+            <span>Employees</span>
+          </a>
+        </li>
+        <li class="logout">
+          <a (click)="logout()">
+            <i class="icon">🚪</i>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>

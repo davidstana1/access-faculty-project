@@ -19,6 +19,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage: string | null = null;
+  passwordVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -30,7 +31,6 @@ export class LoginComponent {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
     
-    // Verificăm dacă utilizatorul este deja autentificat
     if (this.authService.isAuthenticated) {
       this.router.navigate(['/dashboard']);
     }
@@ -44,8 +44,16 @@ export class LoginComponent {
     return this.loginForm.get('password');
   }
 
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
   onSubmit() {
     if (this.loginForm.invalid) {
+      Object.keys(this.loginForm.controls).forEach(key => {
+        const control = this.loginForm.get(key);
+        control?.markAsTouched();
+      });
       return;
     }
 
@@ -74,7 +82,6 @@ export class LoginComponent {
           if (response) {
             this.isLoading = false;
             console.log('Login successful:', response);
-            // Redirecționarea se face în AuthService
           }
         }
       });

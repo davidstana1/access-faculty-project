@@ -111,9 +111,10 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
     // create roles if non-existing
-    string[] roleNames = { "HR", "GatePersonnel" };
+    string[] roleNames = { "HR", "GatePersonnel", "Manager" };
     foreach (var roleName in roleNames)
     {
         var roleExist = await roleManager.RoleExistsAsync(roleName);
@@ -122,12 +123,12 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(roleName));
         }
     }
-    
+
     // create hr user
     var adminUser = await userManager.FindByNameAsync("hr@company.com");
     if (adminUser == null)
     {
-        var user = new User 
+        var user = new User
         {
             UserName = "hr@company.com",
             Email = "hr@company.com",
@@ -135,19 +136,19 @@ using (var scope = app.Services.CreateScope())
             LastName = "HR",
             EmailConfirmed = true
         };
-        
+
         var result = await userManager.CreateAsync(user, "Hr123456!");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(user, "HR");
         }
     }
-    
+
     // create gate user
     var gateUser = await userManager.FindByNameAsync("gate@company.com");
     if (gateUser == null)
     {
-        var user = new User 
+        var user = new User
         {
             UserName = "gate@company.com",
             Email = "gate@company.com",
@@ -155,13 +156,78 @@ using (var scope = app.Services.CreateScope())
             LastName = "Operator",
             EmailConfirmed = true
         };
-        
+
         var result = await userManager.CreateAsync(user, "Gate123456!");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(user, "GatePersonnel");
         }
     }
+
+    // var division = new Division
+    // {
+    //     Name = "IT Department"
+    // };
+    // context.Divisions.Add(division);
+    // await context.SaveChangesAsync(); 
+
+    var manager = await userManager.FindByEmailAsync("manager@company.com");
+    if (manager == null)
+    {
+        var user = new User
+        {
+            UserName = "manager@company.com",
+            Email = "manager@company.com",
+            FirstName = "Manager",
+            LastName = "Operator",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(user, "Manager123456!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Manager");
+        }
+    }
+    
+    var manager2 = await userManager.FindByEmailAsync("manager2@company.com");
+    if (manager2 == null)
+    {
+        var user2 = new User
+        {
+            UserName = "manager2@company.com",
+            Email = "manager2@company.com",
+            FirstName = "Manager2",
+            LastName = "Operator",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(user2, "Manager123!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user2, "Manager");
+        }
+    }
+//     var employee = new Employee
+//     {
+//         FirstName = "John",
+//         LastName = "Doe",
+//         CNP = "1234567890123",
+//         BadgeNumber = "12345",
+//         PhotoUrl = "http://example.com/photo.jpg",
+//         DivisionId = 1,
+//         BluetoothSecurityCode = "BluetoothCode",
+//         VehicleNumber = "ABC123",
+//         IsAccessEnabled = true,
+//         ApprovedById = "bc840f50-408e-4384-87b9-e4289cbf1999",
+//         ApprovalDate = DateTime.Now,
+//         AccessSchedules = new List<AccessSchedule>(),
+//         AccessLogs = new List<AccessLog>() 
+//     };
+//
+// // Salvează entitatea
+//     context.Employees.Add(employee);
+//     await context.SaveChangesAsync();
 }
 
 app.Run();
