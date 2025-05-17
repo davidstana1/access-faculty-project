@@ -36,7 +36,7 @@ export class LoginComponent {
     }
   }
 
-  get email() {
+  get email() {/////
     return this.loginForm.get('email');
   }
 
