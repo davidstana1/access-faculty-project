@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Employee, EmployeeService } from '../../../services/employee/employee.service';
 import { AuthService, User } from '../../../services/auth.service';
 import { DivisionService } from '../../../services/divisions/division.service';
+import { RouterModule } from '@angular/router';
 
 interface Division {
   id: string;
@@ -15,7 +16,7 @@ interface Division {
   templateUrl: './employee-list.component.html',
   styleUrls: ['./employee-list.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule,RouterModule]
 })
 export class EmployeeListComponent implements OnInit {
   employees: Employee[] = [];

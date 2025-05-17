@@ -1,0 +1,81 @@
+<div class="access-logs-container">
+    <div class="access-logs-header">
+      <button class="back-btn" (click)="goBack()">← Back to Employees</button>
+      <h2>Access Logs for {{ employee?.firstName }} {{ employee?.lastName }}</h2>
+      <div class="employee-info">
+        <div class="employee-badge">
+          <span class="label">Badge:</span> 
+          <span class="value">{{ employee?.badgeNumber }}</span>
+        </div>
+        <div class="employee-division">
+          <span class="label">Division:</span> 
+          <span class="value">{{ employee?.divisionName }}</span>
+        </div>
+        <div class="employee-status">
+          <span class="label">Access Status:</span> 
+          <span class="status-badge" [ngClass]="employee?.isAccessEnabled ? 'status-enabled' : 'status-disabled'">
+            {{ employee?.isAccessEnabled ? 'Enabled' : 'Disabled' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner">
+        <div class="spinner-circle"></div>
+      </div>
+      <span>Loading access logs...</span>
+    </div>
+  
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+  
+    <div *ngIf="!loading && !accessLogs.length" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No access logs found</h3>
+      <p>This employee has no recorded entries or exits.</p>
+    </div>
+  
+    <div *ngIf="!loading && accessLogs.length > 0" class="table-container">
+      <table class="access-logs-table">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Direction</th>
+            <th>Method</th>
+            <th>Vehicle</th>
+            <th>Within Schedule</th>
+            <th *ngIf="isHr() || isGatePersonnel()">Override</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of accessLogs" class="log-row">
+            <td class="timestamp">{{ formatDateTime(log.timestamp) }}</td>
+            <td>
+              <span class="direction-badge" [ngClass]="getDirectionClass(log.direction)">
+                {{ log.direction }}
+                <i class="direction-icon" 
+                   [ngClass]="log.direction === 'Entry' ? 'icon-entry' : 'icon-exit'">
+                  {{ log.direction === 'Entry' ? '→' : '←' }}
+                </i>
+              </span>
+            </td>
+            <td>{{ log.method }}</td>
+            <td>{{ log.vehicleNumber || 'N/A' }}</td>
+            <td>
+              <span class="schedule-badge" [ngClass]="getScheduleClass(log.isWithinSchedule)">
+                {{ log.isWithinSchedule ? 'Yes' : 'Outside Hours' }}
+              </span>
+            </td>
+            <td *ngIf="isHr() || isGatePersonnel()">
+              <span *ngIf="log.wasOverridden" class="override-badge">
+                Overridden
+              </span>
+              <span *ngIf="!log.wasOverridden">-</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

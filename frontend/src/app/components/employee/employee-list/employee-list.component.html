@@ -51,6 +51,7 @@
               {{ employee.isAccessEnabled ? 'Enabled' : 'Disabled' }}
             </span>
           </td>
+          <td><button class="action-btn logs-btn" [routerLink]="['/employees', employee.id, 'access-logs']">Access Logs</button></td>
           <td><button class="edit-btn">Edit</button></td>
           <td><button class="delete-btn" (click)="openDeleteEmployeeModal(employee)">Delete</button></td>
         </tr>

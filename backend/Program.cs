@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using backend.data;
 using backend.entity;
+using backend.enums;
 using backend.service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -208,6 +209,34 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(user2, "Manager");
         }
     }
+    var access_log = new AccessLog
+    {
+        EmployeeId = 11,
+        Timestamp = DateTime.Now,
+        Direction = AccessDirection.Entry,
+        Method = AccessMethod.Vehicle,
+        VehicleNumber = "ABQ141",
+        IsWithinSchedule = true,
+        WasOverridden = true,
+        OverrideUserId = "2"
+    };
+    var access_log2 = new AccessLog
+    {
+        EmployeeId = 11,
+        Timestamp = new DateTime(2025,5,17,19,30,0),
+        Direction = AccessDirection.Exit,
+        Method = AccessMethod.Vehicle,
+        VehicleNumber = "ABQ141",
+        IsWithinSchedule = true,
+        WasOverridden = true,
+        OverrideUserId = "2"
+    };
+        
+    context.AccessLogs.Add(access_log);
+    await context.SaveChangesAsync();
+
+    context.AccessLogs.Add(access_log2);
+    await context.SaveChangesAsync();
 //     var employee = new Employee
 //     {
 //         FirstName = "John",

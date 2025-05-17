@@ -41,11 +41,25 @@ export interface UpdateEmployeeDto {
   isAccessEnabled: boolean;
 }
 
+export interface AccessLog {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  timestamp: Date;
+  direction: string;
+  method: string;
+  vehicleNumber: string;
+  isWithinSchedule: boolean;
+  wasOverridden: boolean;
+  overrideUserId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
   private apiUrl = `http://localhost:5203/api/employee`;
+  private apiUrlAccessLog = `http://localhost:5203/api/AccessLog`;
 
   constructor(private http: HttpClient) { }
 
@@ -72,5 +86,9 @@ export class EmployeeService {
   toggleAccess(id: number, employee: UpdateEmployeeDto): Observable<void> {
     employee.isAccessEnabled = !employee.isAccessEnabled;
     return this.updateEmployee(id, employee);
+  }
+
+  getEmployeeAccessLogs(employeeId: number): Observable<AccessLog[]> {
+    return this.http.get<AccessLog[]>(`${this.apiUrlAccessLog}/employee/${employeeId}`);
   }
 }
