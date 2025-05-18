@@ -44,14 +44,10 @@
 
           const roles = response.user.roles;
 
-          if (roles.includes('HR')) {
+          if (roles.includes('HR') || roles.includes('Manager')) {
             this.router.navigate(['/employees']);
           } else if (roles.includes('GatePersonnel')) {
-            this.router.navigate(['/gates']);
-          } else if (roles.includes('Manager')) {
-            this.router.navigate(['/employees']); 
-          } else {
-            this.router.navigate(['/dashboard']); //to be made?
+            this.router.navigate(['/gate']);
           }
         })
       );
@@ -63,6 +59,10 @@
 
     isManager(user: User): boolean {
       return user.roles.includes('Manager');
+    }
+
+    isGatePersonnel(user: User): boolean {
+      return user.roles.includes('GatePersonnel');
     }
 
     logout() {

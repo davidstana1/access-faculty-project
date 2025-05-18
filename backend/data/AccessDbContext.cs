@@ -17,6 +17,7 @@ namespace backend.data
         public DbSet<AccessLog> AccessLogs { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<GateStatus> GateStatuses { get; set; }
+        public DbSet<AccessRequest> AccessRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

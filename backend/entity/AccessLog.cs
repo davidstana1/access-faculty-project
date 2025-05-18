@@ -11,7 +11,4 @@ public class AccessLog
     public AccessDirection Direction { get; set; }
     public AccessMethod Method { get; set; }
     public string VehicleNumber { get; set; }
-    public bool IsWithinSchedule { get; set; }
-    public bool WasOverridden { get; set; }
-    public string OverrideUserId { get; set; }
 }

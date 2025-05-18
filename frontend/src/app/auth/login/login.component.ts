@@ -32,7 +32,7 @@ export class LoginComponent {
     });
     
     if (this.authService.isAuthenticated) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/employees']);
     }
   }
 

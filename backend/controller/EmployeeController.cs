@@ -125,11 +125,13 @@ namespace backend.controller
                 return NotFound();
             }
 
-            // Check if user is in HR role or is a Manager of the employee's division
+            // Check if user is in HR, GatePersonnel, or is a Manager of the employee's division
             bool canAccess = await _userManager.IsInRoleAsync(currentUser, "HR") ||
-                            (await _userManager.IsInRoleAsync(currentUser, "Manager") && 
-                             currentUser.DivisionId.HasValue && 
-                             currentUser.DivisionId.Value == employee.DivisionId);
+                             await _userManager.IsInRoleAsync(currentUser, "GatePersonnel") || // gatepersonnel just for testins
+                             (await _userManager.IsInRoleAsync(currentUser, "Manager") &&
+                              currentUser.DivisionId.HasValue &&
+                              currentUser.DivisionId.Value == employee.DivisionId);
+
             
             if (!canAccess)
             {

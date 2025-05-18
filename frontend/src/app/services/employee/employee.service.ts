@@ -49,9 +49,6 @@ export interface AccessLog {
   direction: string;
   method: string;
   vehicleNumber: string;
-  isWithinSchedule: boolean;
-  wasOverridden: boolean;
-  overrideUserId: string;
 }
 
 @Injectable({
@@ -90,5 +87,25 @@ export class EmployeeService {
 
   getEmployeeAccessLogs(employeeId: number): Observable<AccessLog[]> {
     return this.http.get<AccessLog[]>(`${this.apiUrlAccessLog}/employee/${employeeId}`);
+  }
+
+  getAccessLogs(startDate: Date, endDate: Date): Observable<AccessLog[]> {
+    const params = {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString()
+    };
+    
+    return this.http.get<AccessLog[]>(`${this.apiUrlAccessLog}`, { params });
+  }
+
+  createAccessLog(logEntry: any): Observable<any> {
+    // Convert timestamp to ISO string if it's a Date object
+    if (logEntry.timestamp instanceof Date) {
+      logEntry = {
+        ...logEntry,
+        timestamp: logEntry.timestamp.toISOString()
+      };
+    }
+    return this.http.post<any>(`${this.apiUrlAccessLog}`, logEntry);
   }
 }
