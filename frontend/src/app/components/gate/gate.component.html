@@ -1,0 +1,127 @@
+<div class="gate-container">
+    <!-- Header with time and gate status -->
+    <div class="gate-header">
+      <div class="current-time">{{ formatTime(currentTime) }}</div>
+      <div class="gate-status" [ngClass]="gateState">
+        Gate Status: {{ gateState | titlecase }}
+      </div>
+    </div>
+    <!-- Gate Visualization -->
+    <div class="gate-visualization">
+      <!-- Gate animation based on state -->
+      <div class="gate-graphic" [ngClass]="gateState">
+        <div class="gate-door"></div>
+    <!-- Show car and employee when opening/open -->
+    <div *ngIf="gateState !== GateState.CLOSED && currentEmployee" class="access-info">
+      <div class="employee-details">
+        <div class="employee-photo">
+          <img *ngIf="currentEmployee?.photoUrl" [src]="currentEmployee.photoUrl" alt="Employee photo">
+          <div *ngIf="!currentEmployee?.photoUrl" class="photo-placeholder">
+            {{ currentEmployee?.firstName?.[0] }}{{ currentEmployee?.lastName?.[0] }}
+          </div>
+        </div>
+        <div class="employee-name">{{ currentEmployee?.firstName }} {{ currentEmployee?.lastName }}</div>
+        <div *ngIf="currentAccessRequest?.vehicleNumber" class="vehicle-number">
+          Vehicle: {{ currentAccessRequest?.vehicleNumber }}
+        </div>
+        <div class="access-direction">
+          {{ currentAccessRequest?.direction }}
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+    <!-- Current Access Request Card -->
+    <div *ngIf="currentAccessRequest && gateState === GateState.CLOSED" class="access-request-card">
+      <h2>Access Request</h2>
+  <div *ngIf="!currentEmployee" class="loading-employee">
+    <div class="spinner">
+      <div class="spinner-circle"></div>
+    </div>
+    <span>Loading employee details...</span>
+  </div>
+  
+  <div *ngIf="currentEmployee" class="request-details">
+    <div class="employee-header">
+      <div class="employee-photo">
+        <img *ngIf="currentEmployee.photoUrl" [src]="currentEmployee.photoUrl" alt="Employee photo">
+        <div *ngIf="!currentEmployee.photoUrl" class="photo-placeholder">
+          {{ currentEmployee.firstName[0] }}{{ currentEmployee.lastName[0] }}
+        </div>
+      </div>
+      <div class="employee-info">
+        <h3>{{ currentEmployee.firstName }} {{ currentEmployee.lastName }}</h3>
+        <div class="badge-number">Badge: {{ currentEmployee.badgeNumber }}</div>
+        <div class="division">Division: {{ currentEmployee.division?.name }}</div>
+      </div>
+    </div>
+    
+    <div class="request-info">
+      <div class="direction">
+        <strong>Direction:</strong> 
+        <span [ngClass]="{'entry': currentAccessRequest.direction === AccessDirection.ENTRY, 'exit': currentAccessRequest.direction === AccessDirection.EXIT}">
+          {{ currentAccessRequest.direction }}
+        </span>
+      </div>
+      <div class="method">
+        <strong>Method:</strong> {{ currentAccessRequest.method }}
+      </div>
+      <div *ngIf="currentAccessRequest.vehicleNumber" class="vehicle">
+        <strong>Vehicle:</strong> {{ currentAccessRequest.vehicleNumber }}
+      </div>
+      <!-- <div class="schedule-status" [ngClass]="{'outside-schedule': !currentAccessRequest.isWithinSchedule}">
+        <strong>Schedule:</strong> 
+        {{ currentAccessRequest.isWithinSchedule ? 'Within allowed hours' : 'OUTSIDE ALLOWED HOURS' }}
+      </div> -->
+    </div>
+    
+    <div class="action-buttons">
+      <button class="deny-button" (click)="denyAccess()">Deny Access</button>
+      <button class="approve-button" (click)="approveAccess()" [disabled]="!currentEmployee.isAccessEnabled">
+        Approve Access
+      </button>
+    </div>
+    
+    <div *ngIf="!currentEmployee.isAccessEnabled" class="access-disabled-warning">
+      Employee access is currently disabled. Cannot approve.
+    </div>
+  </div>
+    </div>
+    <!-- Recent Access Logs -->
+    <div class="recent-logs">
+      <h2>Recent Access Logs</h2>
+  <div *ngIf="accessLogs.length === 0" class="no-logs">
+    No access logs for today
+  </div>
+  
+  <table *ngIf="accessLogs.length > 0" class="logs-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Employee</th>
+        <th>Direction</th>
+        <th>Method</th>
+        <th>Vehicle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of accessLogs.slice(0, 10)" class="log-row">
+        <td>{{ formatDateTime(log.timestamp) }}</td>
+        <td>{{ log.employeeName }}</td>
+        <td>
+          <span
+            *ngIf="log.direction"
+            class="direction-badge"
+            [ngClass]="log.direction.toLowerCase()"
+          >
+            {{ log.direction }}
+          </span>
+          <span *ngIf="!log.direction">N/A</span>
+        </td>
+        <td>{{ log.method }}</td>
+        <td>{{ log.vehicleNumber || 'N/A' }}</td>
+      </tr>
+    </tbody>
+  </table>
+    </div>
+  </div>

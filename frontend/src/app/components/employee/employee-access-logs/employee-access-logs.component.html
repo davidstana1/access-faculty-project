@@ -45,7 +45,7 @@
             <th>Direction</th>
             <th>Method</th>
             <th>Vehicle</th>
-            <th>Within Schedule</th>
+            <!-- <th>Within Schedule</th> -->
             <th *ngIf="isHr() || isGatePersonnel()">Override</th>
           </tr>
         </thead>
@@ -63,17 +63,11 @@
             </td>
             <td>{{ log.method }}</td>
             <td>{{ log.vehicleNumber || 'N/A' }}</td>
-            <td>
+            <!-- <td>
               <span class="schedule-badge" [ngClass]="getScheduleClass(log.isWithinSchedule)">
                 {{ log.isWithinSchedule ? 'Yes' : 'Outside Hours' }}
               </span>
-            </td>
-            <td *ngIf="isHr() || isGatePersonnel()">
-              <span *ngIf="log.wasOverridden" class="override-badge">
-                Overridden
-              </span>
-              <span *ngIf="!log.wasOverridden">-</span>
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>

@@ -81,9 +81,9 @@ export class EmployeeAccessLogsComponent implements OnInit {
     return direction === 'Entry' ? 'direction-entry' : 'direction-exit';
   }
 
-  getScheduleClass(isWithinSchedule: boolean): string {
-    return isWithinSchedule ? 'schedule-ok' : 'schedule-outside';
-  }
+  // getScheduleClass(isWithinSchedule: boolean): string {
+  //   return isWithinSchedule ? 'schedule-ok' : 'schedule-outside';
+  // }
 
   isHr(): boolean {
     return this.authService.currentUserValue?.roles?.includes('HR') ?? false;

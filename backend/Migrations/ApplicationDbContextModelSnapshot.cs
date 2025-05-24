@@ -169,15 +169,8 @@ namespace backend.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsWithinSchedule")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Method")
                         .HasColumnType("int");
-
-                    b.Property<string>("OverrideUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
@@ -186,14 +179,43 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("WasOverridden")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("AccessLogs");
+                });
+
+            modelBuilder.Entity("backend.entity.AccessRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Direction")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VehicleNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccessRequests");
                 });
 
             modelBuilder.Entity("backend.entity.AccessSchedule", b =>
@@ -315,21 +337,21 @@ namespace backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("LastAccessEmployeeId")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsOperational")
+                        .HasColumnType("bit");
 
-                    b.Property<int?>("LastDirection")
-                        .HasColumnType("int");
+                    b.Property<string>("LastOperation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime>("LastOperationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("State")
-                        .HasColumnType("int");
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LastAccessEmployeeId");
 
                     b.ToTable("GateStatuses");
                 });
@@ -531,15 +553,6 @@ namespace backend.Migrations
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Division");
-                });
-
-            modelBuilder.Entity("backend.entity.GateStatus", b =>
-                {
-                    b.HasOne("backend.entity.Employee", "LastAccessEmployee")
-                        .WithMany()
-                        .HasForeignKey("LastAccessEmployeeId");
-
-                    b.Navigation("LastAccessEmployee");
                 });
 
             modelBuilder.Entity("backend.entity.RefreshToken", b =>

@@ -6,7 +6,12 @@ using System.Text;
 using backend.data;
 using backend.entity;
 using backend.enums;
+using backend.mock;
 using backend.service;
+using backend.service.access.access_request;
+using backend.service.access.gate;
+using backend.service.access.gate.command_sender;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,15 +79,72 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Adăugare HttpClient și servicii mock
+builder.Services.AddHttpClient();
+//builder.Services.AddHostedService<MockMobileApp>();
+builder.Services.AddMockEspGateDevice();
+
+// Adăugare servicii pentru accesarea porții
+builder.Services.AddScoped<IAccessRequestService, AccessRequestService>();
+builder.Services.AddScoped<IGateService, GateService>();
+
+// Configurare condiționată a IGateCommandSender bazată pe mediu
+if (builder.Environment.IsDevelopment())
+{
+    // În mediul de dezvoltare, utilizăm configurarea mock
+    builder.Services.AddScoped<IGateCommandSender, EspGateCommandSender>(sp =>
+    {
+        var httpClient = sp.GetRequiredService<HttpClient>();
+        var config = sp.GetRequiredService<IConfiguration>();
+        var logger = sp.GetRequiredService<ILogger<EspGateCommandSender>>();
+        
+        // Asigurați-vă că appsettings.Development.json are GateController:Url configurat
+        return new EspGateCommandSender(httpClient, config, logger);
+    });
+}
+else
+{
+    // În mediul de producție, utilizăm implementarea standard
+    builder.Services.AddScoped<IGateCommandSender, EspGateCommandSender>();
+}
 
 // add signalR for real time 
 builder.Services.AddSignalR();
 
 // add swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Introdu un token JWT pentru autorizare"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new string[] { }
+        }
+    });
+});
 
 var app = builder.Build();
+
+// Configurare middleware pentru mock ESP în mediul de dezvoltare
+if (app.Environment.IsDevelopment())
+{
+    // Setup mock ESP32 endpoints on a different route prefix
+    var espMockApp = app.Map("/mock-esp", builder => builder.UseMockEspGateDevice());
+}
 
 // http pipeline
 if (app.Environment.IsDevelopment())
@@ -215,10 +277,7 @@ using (var scope = app.Services.CreateScope())
         Timestamp = DateTime.Now,
         Direction = AccessDirection.Entry,
         Method = AccessMethod.Vehicle,
-        VehicleNumber = "ABQ141",
-        IsWithinSchedule = true,
-        WasOverridden = true,
-        OverrideUserId = "2"
+        VehicleNumber = "ABQ141"
     };
     var access_log2 = new AccessLog
     {
@@ -226,10 +285,7 @@ using (var scope = app.Services.CreateScope())
         Timestamp = new DateTime(2025,5,17,19,30,0),
         Direction = AccessDirection.Exit,
         Method = AccessMethod.Vehicle,
-        VehicleNumber = "ABQ141",
-        IsWithinSchedule = true,
-        WasOverridden = true,
-        OverrideUserId = "2"
+        VehicleNumber = "ABQ141"
     };
         
     context.AccessLogs.Add(access_log);
