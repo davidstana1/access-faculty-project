@@ -25,7 +25,9 @@ export class EmployeeListComponent implements OnInit {
   currentUserValue: User | null = null;
   showAddEmployeeModal: boolean = false;
   showDeleteEmployeeModal: boolean = false;
+  showEditEmployeeModal: boolean = false;
   employeeToDelete: Employee | null = null;
+  employeeToEdit: Employee | null = null;
   employeeForm: FormGroup;
   submitting: boolean = false;
 
@@ -123,6 +125,30 @@ export class EmployeeListComponent implements OnInit {
     });
   }
 
+  openEditEmployeeModal(employee: Employee): void {
+    this.showEditEmployeeModal = true;
+    this.employeeToEdit = employee;
+    
+    // Populate the form with employee data
+    this.employeeForm.patchValue({
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      cnp: employee.cnp,
+      badgeNumber: employee.badgeNumber,
+      divisionId: employee.divisionId,
+      bluetoothSecurityCode: employee.bluetoothSecurityCode,
+      vehicleNumber: employee.vehicleNumber,
+      photoUrl: employee.photoUrl
+    });
+  }
+
+  closeEditEmployeeModal(event: Event): void {
+    event.preventDefault();
+    this.showEditEmployeeModal = false;
+    this.employeeToEdit = null;
+    this.employeeForm.reset();
+  }
+
   onSubmit(): void {
     if (this.employeeForm.invalid) {
       Object.keys(this.employeeForm.controls).forEach(key => {
@@ -136,16 +162,40 @@ export class EmployeeListComponent implements OnInit {
     
     const employeeData = this.employeeForm.value;
     
-    this.employeeService.createEmployee(employeeData).subscribe({
-      next: (newEmployee) => {
-        this.submitting = false;
-        this.showAddEmployeeModal = false;
-        this.loadEmployees();
-      },
-      error: (error) => {
-        console.error('Error creating employee', error);
-        this.submitting = false;
-      }
-    });
+    if (this.employeeToEdit) {
+      // Edit existing employee
+      const updateData = {
+        ...employeeData,
+        id: this.employeeToEdit.id,
+        isAccessEnabled: this.employeeToEdit.isAccessEnabled
+      };
+      
+      this.employeeService.editEmployee(this.employeeToEdit.id, updateData).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.showEditEmployeeModal = false;
+          this.employeeToEdit = null;
+          this.employeeForm.reset();
+          this.loadEmployees();
+        },
+        error: (error) => {
+          console.error('Error updating employee', error);
+          this.submitting = false;
+        }
+      });
+    } else {
+      // Create new employee
+      this.employeeService.createEmployee(employeeData).subscribe({
+        next: (newEmployee) => {
+          this.submitting = false;
+          this.showAddEmployeeModal = false;
+          this.loadEmployees();
+        },
+        error: (error) => {
+          console.error('Error creating employee', error);
+          this.submitting = false;
+        }
+      });
+    }
   }
 }

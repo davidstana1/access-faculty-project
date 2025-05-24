@@ -125,11 +125,13 @@ namespace backend.controller
                 return NotFound();
             }
 
-            // Check if user is in HR role or is a Manager of the employee's division
+            // Check if user is in HR, GatePersonnel, or is a Manager of the employee's division
             bool canAccess = await _userManager.IsInRoleAsync(currentUser, "HR") ||
-                            (await _userManager.IsInRoleAsync(currentUser, "Manager") && 
-                             currentUser.DivisionId.HasValue && 
-                             currentUser.DivisionId.Value == employee.DivisionId);
+                             await _userManager.IsInRoleAsync(currentUser, "GatePersonnel") || // gatepersonnel just for testins
+                             (await _userManager.IsInRoleAsync(currentUser, "Manager") &&
+                              currentUser.DivisionId.HasValue &&
+                              currentUser.DivisionId.Value == employee.DivisionId);
+
             
             if (!canAccess)
             {
@@ -187,6 +189,77 @@ namespace backend.controller
         [HttpPut("{id}")]
         [Authorize(Roles = "HR,Manager")]
         public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeDto employeeDto)
+        {
+            if (id != employeeDto.Id)
+            {
+                return BadRequest();
+            }
+
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.FindByIdAsync(userId);
+            
+            // Manager can only update employees in their division and can't change division
+            if (await _userManager.IsInRoleAsync(currentUser, "Manager"))
+            {
+                if (!currentUser.DivisionId.HasValue || employee.DivisionId != currentUser.DivisionId.Value)
+                {
+                    return Forbid();
+                }
+                
+                // Managers can't change employee division
+                if (employeeDto.DivisionId != employee.DivisionId)
+                {
+                    return BadRequest("Managers cannot change employee division");
+                }
+            }
+
+            // HR can change all fields
+            employee.FirstName = employeeDto.FirstName;
+            employee.LastName = employeeDto.LastName;
+            
+            // Only HR can change these fields
+            if (await _userManager.IsInRoleAsync(currentUser, "HR"))
+            {
+                employee.CNP = employeeDto.CNP;
+                employee.BadgeNumber = employeeDto.BadgeNumber;
+                employee.DivisionId = employeeDto.DivisionId;
+            }
+            
+            // Both HR and Manager can update these fields
+            employee.PhotoUrl = employeeDto.PhotoUrl;
+            employee.BluetoothSecurityCode = employeeDto.BluetoothSecurityCode;
+            employee.VehicleNumber = employeeDto.VehicleNumber;
+            employee.IsAccessEnabled = employeeDto.IsAccessEnabled;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EmployeeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PATCH: api/Employee/5
+        [HttpPatch("{id}")]
+        [Authorize(Roles = "HR,Manager")]
+        public async Task<IActionResult> EditEmployee(int id, UpdateEmployeeDto employeeDto)
         {
             if (id != employeeDto.Id)
             {
