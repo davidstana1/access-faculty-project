@@ -108,4 +108,8 @@ export class EmployeeService {
     }
     return this.http.post<any>(`${this.apiUrlAccessLog}`, logEntry);
   }
+
+  editEmployee(id: number, employee: UpdateEmployeeDto): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}`, employee);
+  }
 }

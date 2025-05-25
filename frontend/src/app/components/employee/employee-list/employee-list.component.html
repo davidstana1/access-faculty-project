@@ -52,7 +52,7 @@
             </span>
           </td>
           <td><button class="action-btn logs-btn" [routerLink]="['/employees', employee.id, 'access-logs']">Access Logs</button></td>
-          <td><button class="edit-btn">Edit</button></td>
+          <td><button class="edit-btn" (click)="openEditEmployeeModal(employee)">Edit</button></td>
           <td><button class="delete-btn" (click)="openDeleteEmployeeModal(employee)">Delete</button></td>
         </tr>
       </tbody>
@@ -145,6 +145,93 @@
   </div>
 </div>
 <!-- end of add employee modal -->
+
+<!-- Edit Employee Modal -->
+<div class="modal-backdrop" *ngIf="showEditEmployeeModal" (click)="closeEditEmployeeModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Edit Employee</h3>
+      <button class="close-btn" (click)="closeEditEmployeeModal($event)">×</button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="editEmployeeForm" (ngSubmit)="onEditEmployeeSubmit()">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" formControlName="firstName" class="form-control">
+          <div *ngIf="editEmployeeForm.get('firstName')?.invalid && editEmployeeForm.get('firstName')?.touched" class="error-message">
+            First name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" formControlName="lastName" class="form-control">
+          <div *ngIf="editEmployeeForm.get('lastName')?.invalid && editEmployeeForm.get('lastName')?.touched" class="error-message">
+            Last name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cnp">CNP</label>
+          <input type="text" id="cnp" formControlName="cnp" class="form-control">
+          <div *ngIf="editEmployeeForm.get('cnp')?.invalid && editEmployeeForm.get('cnp')?.touched" class="error-message">
+            CNP must be exactly 13 characters
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="badgeNumber">Badge Number</label>
+          <input type="text" id="badgeNumber" formControlName="badgeNumber" class="form-control">
+          <div *ngIf="editEmployeeForm.get('badgeNumber')?.invalid && editEmployeeForm.get('badgeNumber')?.touched" class="error-message">
+            Badge number is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="division">Division</label>
+          <select id="division" formControlName="divisionId" class="form-control">
+            <option value="">Select Division</option>
+            <option *ngFor="let division of divisions" [value]="division.id">{{ division.name }}</option>
+          </select>
+          <div *ngIf="editEmployeeForm.get('divisionId')?.invalid && editEmployeeForm.get('divisionId')?.touched" class="error-message">
+            Division is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bluetoothSecurityCode">Bluetooth Security Code</label>
+          <input type="text" id="bluetoothSecurityCode" formControlName="bluetoothSecurityCode" class="form-control">
+          <div *ngIf="editEmployeeForm.get('bluetoothSecurityCode')?.invalid && editEmployeeForm.get('bluetoothSecurityCode')?.touched" class="error-message">
+            Bluetooth security code is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="vehicleNumber">Vehicle Number (Optional)</label>
+          <input type="text" id="vehicleNumber" formControlName="vehicleNumber" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="photoUrl">Photo URL (Optional)</label>
+          <input type="text" id="photoUrl" formControlName="photoUrl" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" formControlName="isAccessEnabled"> Access Enabled
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeEditEmployeeModal($event)">Cancel</button>
+          <button type="submit" class="submit-btn" [disabled]="editEmployeeForm.invalid || submitting">
+            {{ submitting ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- DELETE MODAL -->
 <div class="modal-backdrop" *ngIf="showDeleteEmployeeModal" (click)="closeDeleteEmployeeModal($event)">
