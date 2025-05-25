@@ -1,57 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'access_pending_page.dart';
+import 'package:acccess_guard/features/bluetooth_service.dart' as my_bt;
 
-
-class BluetoothSelectionPage extends StatelessWidget {
+class BluetoothSelectionPage extends StatefulWidget {
   const BluetoothSelectionPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Dispozitive Bluetooth fictive
-    final List<String> devices = [
-      "Dispozitivul 1 - 00:11:22:33:44:55",
-      "Dispozitivul 2 - AA:BB:CC:DD:EE:FF",
-      "Dispozitivul 3 - 66:77:88:99:00:11",
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Alege conexiunea"),
-      ),
-      body: ListView.builder(
-        itemCount: devices.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text(devices[index]),
-              trailing: const Icon(Icons.bluetooth),
-              onTap: () {
-                // Navighează spre pagina următoare (pagina 5)
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AccessPendingPage(),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
+  State<BluetoothSelectionPage> createState() => _BluetoothSelectionPageState();
 }
 
-// Pagină temporară pentru pasul următor
-class PlaceholderPage extends StatelessWidget {
-  const PlaceholderPage({super.key});
+class _BluetoothSelectionPageState extends State<BluetoothSelectionPage> {
+  final bluetoothService = my_bt.BluetoothService();
+
+  @override
+  void initState() {
+    super.initState();
+    bluetoothService.startScan();
+  }
+
+  @override
+  void dispose() {
+    bluetoothService.stopScan();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Conectare...")),
-      body: const Center(child: Text("Simulare pagina 5")),
+      appBar: AppBar(title: const Text("Alege conexiunea")),
+      body: StreamBuilder<List<ScanResult>>(
+        stream: bluetoothService.scanResults,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final filteredDevices = snapshot.data!
+              .map((r) => r.device)
+              .where((d) =>
+          d.name.isNotEmpty &&
+              d.name.toLowerCase().contains("desktop")) // înlocuiește "laptop" cu ce vrei
+              .toList();
+
+          if (filteredDevices.isEmpty) {
+            return const Center(child: Text("Niciun dispozitiv relevant găsit."));
+          }
+
+          return ListView.builder(
+            itemCount: filteredDevices.length,
+            itemBuilder: (context, index) {
+              final device = filteredDevices[index];
+              return Card(
+                child: ListTile(
+                  title: Text(device.name),
+                  subtitle: Text(device.id.id),
+                  trailing: const Icon(Icons.bluetooth),
+                  onTap: () {
+                    // acțiune la tap
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
