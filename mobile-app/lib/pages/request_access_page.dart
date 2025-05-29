@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'access_history_page.dart';
-import 'bluetooth_selection_page.dart';
+import 'connection_selection_page.dart';
 
 class RequestAccessPage extends StatelessWidget {
   const RequestAccessPage({super.key});
@@ -45,11 +45,22 @@ class RequestAccessPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BluetoothSelectionPage(),
+                        builder: (context) => const ConecctionSelectionPage(),
                       ),
                     );
                   },
-                  child: const Text("Solicita accesul"),
+                  child: const Text(
+                      "Solicita accesul",
+                      style: TextStyle(
+                        fontSize: 30
+                      ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(100),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                  ),
                 ),
               ),
             ],
