@@ -270,4 +270,4 @@ export class GateComponent implements OnInit, OnDestroy {
     }
   }
   
-}
+}//

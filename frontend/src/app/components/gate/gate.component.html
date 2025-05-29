@@ -6,31 +6,6 @@
         Gate Status: {{ gateState | titlecase }}
       </div>
     </div>
-    <!-- Gate Visualization -->
-    <div class="gate-visualization">
-      <!-- Gate animation based on state -->
-      <div class="gate-graphic" [ngClass]="gateState">
-        <div class="gate-door"></div>
-    <!-- Show car and employee when opening/open -->
-    <div *ngIf="gateState !== GateState.CLOSED && currentEmployee" class="access-info">
-      <div class="employee-details">
-        <div class="employee-photo">
-          <img *ngIf="currentEmployee?.photoUrl" [src]="currentEmployee.photoUrl" alt="Employee photo">
-          <div *ngIf="!currentEmployee?.photoUrl" class="photo-placeholder">
-            {{ currentEmployee?.firstName?.[0] }}{{ currentEmployee?.lastName?.[0] }}
-          </div>
-        </div>
-        <div class="employee-name">{{ currentEmployee?.firstName }} {{ currentEmployee?.lastName }}</div>
-        <div *ngIf="currentAccessRequest?.vehicleNumber" class="vehicle-number">
-          Vehicle: {{ currentAccessRequest?.vehicleNumber }}
-        </div>
-        <div class="access-direction">
-          {{ currentAccessRequest?.direction }}
-        </div>
-      </div>
-    </div>
-  </div>
-    </div>
     <!-- Current Access Request Card -->
     <div *ngIf="currentAccessRequest && gateState === GateState.CLOSED" class="access-request-card">
       <h2>Access Request</h2>
