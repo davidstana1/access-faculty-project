@@ -25,8 +25,11 @@ export class EmployeeListComponent implements OnInit {
   currentUserValue: User | null = null;
   showAddEmployeeModal: boolean = false;
   showDeleteEmployeeModal: boolean = false;
+  showEditEmployeeModal: boolean = false;
   employeeToDelete: Employee | null = null;
+  employeeToEdit: Employee | null = null;
   employeeForm: FormGroup;
+  editEmployeeForm: FormGroup;
   submitting: boolean = false;
 
   constructor(
@@ -44,6 +47,19 @@ export class EmployeeListComponent implements OnInit {
       bluetoothSecurityCode: ['', [Validators.required]],
       vehicleNumber: [''],
       photoUrl: ['']
+    });
+
+    this.editEmployeeForm = this.fb.group({
+      id: [''],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      cnp: ['', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
+      badgeNumber: ['', [Validators.required]],
+      divisionId: ['', [Validators.required]],
+      bluetoothSecurityCode: ['', [Validators.required]],
+      vehicleNumber: [''],
+      photoUrl: [''],
+      isAccessEnabled: [true]
     });
   }
 
@@ -144,6 +160,54 @@ export class EmployeeListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating employee', error);
+        this.submitting = false;
+      }
+    });
+  }
+
+  openEditEmployeeModal(employee: Employee): void {
+    this.employeeToEdit = employee;
+    this.showEditEmployeeModal = true;
+    
+    this.editEmployeeForm.patchValue({
+      id: employee.id,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      cnp: employee.cnp,
+      badgeNumber: employee.badgeNumber,
+      divisionId: employee.divisionId,
+      bluetoothSecurityCode: employee.bluetoothSecurityCode,
+      vehicleNumber: employee.vehicleNumber,
+      photoUrl: employee.photoUrl,
+      isAccessEnabled: employee.isAccessEnabled
+    });
+  }
+
+  closeEditEmployeeModal(event: Event): void {
+    event.preventDefault();
+    this.showEditEmployeeModal = false;
+    this.employeeToEdit = null;
+    this.editEmployeeForm.reset();
+  }
+
+  onEditEmployeeSubmit(): void {
+    if (this.editEmployeeForm.invalid || !this.employeeToEdit) {
+      return;
+    }
+
+    this.submitting = true;
+    const updatedEmployee = this.editEmployeeForm.value;
+
+    this.employeeService.editEmployee(this.employeeToEdit.id, updatedEmployee).subscribe({
+      next: () => {
+        this.showEditEmployeeModal = false;
+        this.employeeToEdit = null;
+        this.editEmployeeForm.reset();
+        this.loadEmployees();
+        this.submitting = false;
+      },
+      error: (error) => {
+        console.error('Error editing employee', error);
         this.submitting = false;
       }
     });

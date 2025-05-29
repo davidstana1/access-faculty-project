@@ -256,6 +256,77 @@ namespace backend.controller
             return NoContent();
         }
 
+        // PATCH: api/Employee/5
+        [HttpPatch("{id}")]
+        [Authorize(Roles = "HR,Manager")]
+        public async Task<IActionResult> EditEmployee(int id, [FromBody] UpdateEmployeeDto employeeDto)
+        {
+            if (id != employeeDto.Id)
+            {
+                return BadRequest();
+            }
+
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUser = await _userManager.FindByIdAsync(userId);
+            
+            // Manager can only update employees in their division and can't change division
+            if (await _userManager.IsInRoleAsync(currentUser, "Manager"))
+            {
+                if (!currentUser.DivisionId.HasValue || employee.DivisionId != currentUser.DivisionId.Value)
+                {
+                    return Forbid();
+                }
+                
+                // Managers can't change employee division
+                if (employeeDto.DivisionId != employee.DivisionId)
+                {
+                    return BadRequest("Managers cannot change employee division");
+                }
+            }
+
+            // Update allowed fields
+            employee.FirstName = employeeDto.FirstName;
+            employee.LastName = employeeDto.LastName;
+            
+            // Only HR can change these fields
+            if (await _userManager.IsInRoleAsync(currentUser, "HR"))
+            {
+                employee.CNP = employeeDto.CNP;
+                employee.BadgeNumber = employeeDto.BadgeNumber;
+                employee.DivisionId = employeeDto.DivisionId;
+            }
+            
+            // Both HR and Manager can update these fields
+            employee.PhotoUrl = employeeDto.PhotoUrl;
+            employee.BluetoothSecurityCode = employeeDto.BluetoothSecurityCode;
+            employee.VehicleNumber = employeeDto.VehicleNumber;
+            employee.IsAccessEnabled = employeeDto.IsAccessEnabled;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EmployeeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         // DELETE: api/Employee/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "HR")]
