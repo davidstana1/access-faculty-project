@@ -5,6 +5,7 @@ import 'package:acccess_guard/services/send_service_esp.dart';
 import 'access_pending_page.dart';
 import 'package:acccess_guard/services/send_service_web.dart';
 
+bool receivedResponse = false; // devinde true cand primes raspuns de la web/esp
 
 class ConecctionSelectionPage extends StatelessWidget {
   const ConecctionSelectionPage({super.key});
@@ -22,6 +23,12 @@ class ConecctionSelectionPage extends StatelessWidget {
 
     // Așteaptă 3 secunde
     await Future.delayed(const Duration(seconds: 3));
+
+    // Așteaptă până când receivedResponse devine true
+    // while (!receivedResponse) {
+    //   await Future.delayed(const Duration(milliseconds: 100));
+    // }
+    // receivedResponse = false;
 
     // Revine la pagina principala
     Navigator.push(
