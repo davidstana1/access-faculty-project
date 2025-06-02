@@ -1,6 +1,8 @@
+using backend.data;
 using backend.dto.access_request;
 using backend.service.access.access_request;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.controller;
 
@@ -9,10 +11,12 @@ namespace backend.controller;
 public class AccessRequestController : ControllerBase
 {
     private readonly IAccessRequestService _accessRequestService;
+    private readonly ApplicationDbContext _context;
 
-    public AccessRequestController(IAccessRequestService accessRequestService)
+    public AccessRequestController(IAccessRequestService accessRequestService,ApplicationDbContext context)
     {
         _accessRequestService = accessRequestService;
+        _context = context;
     }
 
     // GET: api/accessRequests/pending
@@ -22,6 +26,20 @@ public class AccessRequestController : ControllerBase
         var pendingRequests = await _accessRequestService.GetPendingRequestsAsync();
         return Ok(pendingRequests);
     }
+    
+    [HttpGet("latest")]
+    public async Task<IActionResult> GetLatestRequest()
+    {
+        var latestRequest = await _context.AccessRequests
+            .OrderByDescending(r => r.Timestamp)
+            .FirstOrDefaultAsync();
+
+        if (latestRequest == null)
+            return NotFound();
+
+        return Ok(latestRequest);
+    }
+
 
     // POST: api/accessRequests
     [HttpPost]

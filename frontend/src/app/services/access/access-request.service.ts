@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AccessRequestService {
-  private apiUrl = `http://localhost:5203/api/accessRequests`; //needs to be done
+  private apiUrl = `http://localhost:5000/api/accessRequests`; //needs to be done
 
   constructor(private http: HttpClient) { }
 
@@ -23,4 +23,13 @@ export class AccessRequestService {
     return this.http.delete<any>(`${this.apiUrl}/${id}`)
   }
 
+  getLatestAccessRequest(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/latest`)
+  }
+
+  sendToEsp(data: string): Observable<any> {
+    return this.http.post('/api/employee/send-to-esp', data, {
+      headers: { 'Content-Type': 'text/plain' }
+    });
+  }
 }
