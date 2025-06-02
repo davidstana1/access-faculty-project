@@ -11,6 +11,7 @@ using backend.service;
 using backend.service.access.access_request;
 using backend.service.access.gate;
 using backend.service.access.gate.command_sender;
+// using backend.signalR;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -110,6 +111,11 @@ else
 
 // add signalR for real time 
 builder.Services.AddSignalR();
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5000);
+});
+
 
 // add swagger
 builder.Services.AddEndpointsApiExplorer();

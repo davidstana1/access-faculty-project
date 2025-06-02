@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class GateService {
-  private apiUrl = `http://localhost:5203/api/gate`;
+  private apiUrl = `http://localhost:5000/api/gate`;
 
   constructor(private http: HttpClient) { }
 

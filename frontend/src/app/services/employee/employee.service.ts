@@ -55,8 +55,8 @@ export interface AccessLog {
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = `http://localhost:5203/api/employee`;
-  private apiUrlAccessLog = `http://localhost:5203/api/AccessLog`;
+  private apiUrl = `http://localhost:5000/api/employee`;
+  private apiUrlAccessLog = `http://localhost:5000/api/AccessLog`;
 
   constructor(private http: HttpClient) { }
 

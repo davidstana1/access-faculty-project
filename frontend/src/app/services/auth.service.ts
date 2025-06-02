@@ -22,7 +22,7 @@
     providedIn: 'root'
   })
   export class AuthService {
-    private apiUrl = `http://localhost:5203/api/auth`; // API endpoint-ul pentru login
+    private apiUrl = `http://localhost:5000/api/auth`; // API endpoint-ul pentru login
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 

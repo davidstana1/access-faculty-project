@@ -7,7 +7,7 @@
       </div>
     </div>
     <!-- Current Access Request Card -->
-    <div *ngIf="currentAccessRequest && gateState === GateState.CLOSED" class="access-request-card">
+    <div *ngIf="currentAccessRequest" class="access-request-card">
       <h2>Access Request</h2>
   <div *ngIf="!currentEmployee" class="loading-employee">
     <div class="spinner">
