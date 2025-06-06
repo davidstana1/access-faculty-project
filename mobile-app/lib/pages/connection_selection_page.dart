@@ -1,9 +1,14 @@
-import 'package:acccess_guard/pages/request_access_page.dart';
+import 'package:acccess_guard/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:acccess_guard/services/send_service_esp.dart';
 import 'access_pending_page.dart';
 import 'package:acccess_guard/services/send_service_web.dart';
+import 'package:acccess_guard/services/get_service_esp.dart';
+import 'package:acccess_guard/services/get_service_web.dart';
+import 'package:acccess_guard/colors.dart';
+import 'denied_page.dart';
+import 'accepted_page.dart';
 
 bool receivedResponse = false; // devinde true cand primes raspuns de la web/esp
 
@@ -11,7 +16,6 @@ class ConecctionSelectionPage extends StatelessWidget {
   const ConecctionSelectionPage({super.key});
 
   Future<void> _onFootPressed(BuildContext context) async {
-    // TODO: Adaugă logica pentru „Pe jos”
 
     await sendDataToWeb(context);
 
@@ -21,20 +25,18 @@ class ConecctionSelectionPage extends StatelessWidget {
       MaterialPageRoute(builder: (context) => const AccessPendingPage()),
     );
 
-    // Așteaptă 3 secunde
-    await Future.delayed(const Duration(seconds: 3));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Mod selectat: Pe jos')),
+    );
 
-    // Așteaptă până când receivedResponse devine true
-    // while (!receivedResponse) {
-    //   await Future.delayed(const Duration(milliseconds: 100));
-    // }
-    // receivedResponse = false;
+    // Așteaptă până când ESP-ul trimite răspunsul (maxim 10 secunde)
+    final raspuns = await checkAccesESP();
 
     // Revine la pagina principala
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const RequestAccessPage(),
+        builder: (context) => const HomePage(),
       ),
     );
 
@@ -42,12 +44,47 @@ class ConecctionSelectionPage extends StatelessWidget {
       const SnackBar(content: Text('Mod selectat: Pe jos')),
     );
 
-    // Navighează spre o altă pagină dacă vrei:
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => const SomeOtherPage()));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          raspuns == "permis"
+              ? 'Acces permis (pe jos)'
+              : raspuns == "respins"
+              ? 'Acces respins (pe jos)'
+              : 'Fără răspuns de la Web',
+        ),
+      ),
+    );
+
+    if (raspuns == "permis") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AcceptedPage()),
+      );
+    } else if (raspuns == "respins") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DeniedPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Răspuns necunoscut de la Web")),
+      );
+    }
+
+    // Așteaptă 3 secunde
+    await Future.delayed(const Duration(seconds: 3));
+
+    // Revine la pagina principala
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
   }
 
   Future<void> _byCarPressed(BuildContext context) async {
-    // TODO: Adaugă logica pentru „Cu mașina”
 
     await sendDataToEsp(context); // trimite cererea
 
@@ -57,6 +94,49 @@ class ConecctionSelectionPage extends StatelessWidget {
       MaterialPageRoute(builder: (context) => const AccessPendingPage()),
     );
 
+    // Așteaptă până când ESP-ul trimite răspunsul (maxim 10 secunde)
+    final raspuns = await checkAccesESP();
+
+    // Revine la pagina principala
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Mod selectat: Cu mașina')),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          raspuns == "permis"
+              ? 'Acces permis (cu mașina)'
+              : raspuns == "respins"
+              ? 'Acces respins (cu mașina)'
+              : 'Fără răspuns de la ESP',
+        ),
+      ),
+    );
+
+    if (raspuns == "permis") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AcceptedPage()),
+      );
+    } else if (raspuns == "respins") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DeniedPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Răspuns necunoscut de la ESP")),
+      );
+    }
+
     // Așteaptă 3 secunde
     await Future.delayed(const Duration(seconds: 3));
 
@@ -64,12 +144,8 @@ class ConecctionSelectionPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const RequestAccessPage(),
+        builder: (context) => const HomePage(),
       ),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mod selectat: Cu mașina')),
     );
   }
 
@@ -77,6 +153,12 @@ class ConecctionSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        backgroundColor: appBar_light,
+        centerTitle: true,
         title: const Text("Alege modul de acces"),
       ),
       body: Padding(

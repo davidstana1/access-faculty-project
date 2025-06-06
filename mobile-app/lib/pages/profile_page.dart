@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:acccess_guard/colors.dart';
 
-class AccessHistoryPage extends StatelessWidget {
-  const AccessHistoryPage({super.key});
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profil utilizator"),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
+        title: const Text(
+            "Profil utilizator",
+            style: TextStyle(fontSize: 24),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -18,10 +24,12 @@ class AccessHistoryPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Nume", style: TextStyle(fontSize: 18)),
-            const Text("Prenume", style: TextStyle(fontSize: 18)),
-            const Text("E-mail", style: TextStyle(fontSize: 18)),
-            const Text("rol", style: TextStyle(fontSize: 18)),
+            const Text("Stana", style: TextStyle(fontSize: 18)),
+            const Text("David", style: TextStyle(fontSize: 18)),
+            const Text("CNP: 5040222020012", style: TextStyle(fontSize: 18)),
+            const Text("Badge number: 9125", style: TextStyle(fontSize: 18)),
+            const Text("IT Department", style: TextStyle(fontSize: 18)),
+            const Text("Vehicle number: AR20ABC", style: TextStyle(fontSize: 18)),
             const SizedBox(height: 30),
             const Text(
               "Istoricul accesarilor",

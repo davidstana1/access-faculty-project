@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:acccess_guard/session.dart';
 
 Future<void> sendDataToEsp(BuildContext context) async {
 
-  String puk = "12300";
+  String? puk = SessionData.pukCriptat;
   String ESP_link = "http://192.168.220.72";
   final url = Uri.parse('$ESP_link/send?value=$puk');
 
@@ -13,9 +14,9 @@ Future<void> sendDataToEsp(BuildContext context) async {
     if (response.statusCode == 200) {
       final message = 'Trimis GET către: $url\nRăspuns: ${response.body}';
       print(message);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text(message)),
+      // );
     } else {
       final error = 'Eroare server: ${response.statusCode}';
       print(error);

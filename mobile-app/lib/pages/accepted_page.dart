@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:acccess_guard/colors.dart';
 
-class AccessPendingPage extends StatelessWidget {
-  const AccessPendingPage({super.key});
+class AcceptedPage extends StatelessWidget {
+  const AcceptedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cerere trimisă"),
       ),
       body: Center(
         child: Padding(
@@ -16,18 +15,18 @@ class AccessPendingPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Icon(Icons.hourglass_top, size: 80, color: Colors.orange),
-              SizedBox(height: 20),
               Text(
-                "Cererea ta a fost trimisă.",
+                "Acces permis",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10),
               Text(
-                "Așteptăm aprobarea administratorului pentru a-ți permite accesul.",
+                "Puteti intra in cladire.",
                 textAlign: TextAlign.center,
               ),
+              SizedBox(height: 20),
+              Icon(Icons.verified_outlined, size: 100, color: Colors.green),
             ],
           ),
         ),

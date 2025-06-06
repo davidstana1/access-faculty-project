@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'request_access_page.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'home_page.dart';
+import 'package:acccess_guard/session.dart';
+import 'package:acccess_guard/services/encrypt.dart';
 
 class PukPage extends StatefulWidget {
   const PukPage({super.key});
@@ -15,16 +18,31 @@ class _PukPageState extends State<PukPage> {
   void _validatePuk() {
     final enteredPuk = _controller.text.trim();
 
+
     if (enteredPuk.isEmpty) {
       _showMessage("Introdu un cod PUK.");
-    } else if (enteredPuk == _validPuk) {
+      return;
+    }
+
+    final encryptedPuk = encryptText(enteredPuk, "shelby");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('PUK introdus: $enteredPuk\nPUK criptat: $encryptedPuk'),
+        duration: const Duration(seconds: 6),
+      ),
+    );
+
+    if (enteredPuk == _validPuk) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const RequestAccessPage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       _showMessage("Cod PUK incorect.");
     }
+
+    SessionData.pukCriptat = enteredPuk;
   }
 
   void _showMessage(String message) {
@@ -53,7 +71,7 @@ class _PukPageState extends State<PukPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Introduceti codul PUK:',
+                'Introduceți codul PUK:',
                 style: TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 20),
@@ -68,7 +86,7 @@ class _PukPageState extends State<PukPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _validatePuk,
-                child: const Text('ok'),
+                child: const Text('OK'),
               ),
             ],
           ),

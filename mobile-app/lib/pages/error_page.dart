@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:acccess_guard/colors.dart';
 
-class AccessPendingPage extends StatelessWidget {
-  const AccessPendingPage({super.key});
+class ErrorPage extends StatelessWidget {
+  const ErrorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cerere trimisă"),
       ),
       body: Center(
         child: Padding(
@@ -16,16 +15,16 @@ class AccessPendingPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Icon(Icons.hourglass_top, size: 80, color: Colors.orange),
+              Icon(Icons.wifi_off_rounded, size: 80, color: Colors.black),
               SizedBox(height: 20),
               Text(
-                "Cererea ta a fost trimisă.",
+                "Eroare conexiune",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10),
               Text(
-                "Așteptăm aprobarea administratorului pentru a-ți permite accesul.",
+                "Va rugam sa verificati conexiunea la internet si incercati din nou.",
                 textAlign: TextAlign.center,
               ),
             ],
